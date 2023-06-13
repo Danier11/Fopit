@@ -49,14 +49,14 @@ void setup(){
   attachInterrupt(digitalPinToInterrupt(BPin), BISr, RISING);
   attachInterrupt(digitalPinToInterrupt(SwitchPin), SwitchISR, CHANGE);
   randomSeed(CircuitPlayground.lightSensor());
-  generateMIDI();
+  generateMIDI(); //For loss sound
   
 
 }
 
 void loop(){
   Soundlvl = CircuitPlayground.mic.soundPressureLevel(50);
-  CircuitPlayground.clearPixels();
+  CircuitPlayground.clearPixels(); 
   ABgame = 0;
   BBgame = 0;
   Switchgame = 0;
@@ -71,7 +71,7 @@ void loop(){
     CircuitPlayground.playTone(midi[64], 500);
     Life = 3;
     Score = 0;
-    Serial.println("Game reset!");
+    Serial.println("Game reset!");              // If life = 0, game will reset
   }
 
   if(Score <= 3){
@@ -93,15 +93,15 @@ void loop(){
     Gamertime = 10000;
     Score = 0;
     CircuitPlayground.clearPixels();
-  }
+  }                                           //Scoring System: As the player increases their score, the time they have to choose decreases.
   
 
-  Rannum = random(0,4);
+  Rannum = random(0,4);                       //RNG for getting the command
   delay(2000); 
 
  InputTopress(Rannum);
 
- if(Bopem){
+ if(Bopem){                                 //Function to start checking if the player is pressing the right button
 
   Delaygametime.start(Gamertime, AsyncDelay::MILLIS);
   ABgame = 0;
@@ -137,7 +137,7 @@ void loop(){
    BBgame = 1;
    BFlag = false;
    break;
-  } 
+  }                                       //Flags for the buttons
 
   } 
     switch(Rannum){
@@ -192,7 +192,7 @@ void loop(){
 
       default:
         break;
-    }
+    }                                                         //This switch case is checking if the player has done the right action
     
     ABgame = 0;
     BBgame = 0;
@@ -208,10 +208,9 @@ void loop(){
     ABgame = 0;
     BBgame = 0;
     Switchgame = 0; 
-    Sgame = 0; 
+    Sgame = 0;                                              //If the player is correct they will receive a point, if not, they lose a life
   } else{
     Life = Life -1;
-    Serial.println("Life -1");
     Serial.print("Life = ");
     Serial.println(Life);
     ABgame = 0;
@@ -223,7 +222,7 @@ void loop(){
 }
 
 
-int InputTopress(int Targetcase){
+int InputTopress(int Targetcase){                     //Funtion to get the command the player will press
 
    switch(Targetcase){
     case 0:
@@ -258,7 +257,7 @@ void generateMIDI(){
   }
   }
 
-void Crisscross(uint32_t color, uint32_t color2, int brightness, int delayTime) {
+void Crisscross(uint32_t color, uint32_t color2, int brightness, int delayTime) {  //For win lights
   CircuitPlayground.setBrightness(brightness);  // Set LED brightness
   
   // Define an array with the desired LED pins
