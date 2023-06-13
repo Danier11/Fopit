@@ -1,7 +1,7 @@
 #include <Adafruit_CircuitPlayground.h>
 #include <AsyncDelay.h>
 
-AsyncDelay Delaytime_1s; AsyncDelay Delaygametime; AsyncDelay Windelay;
+ AsyncDelay Delaygametime; AsyncDelay Windelay;
 int Rannum = 0;
 int BopitIN = 0;
 int Bopem = 0;
@@ -48,9 +48,7 @@ void setup(){
   attachInterrupt(digitalPinToInterrupt(APin), AISr, RISING);
   attachInterrupt(digitalPinToInterrupt(BPin), BISr, RISING);
   attachInterrupt(digitalPinToInterrupt(SwitchPin), SwitchISR, CHANGE);
-  Delaytime_1s.start(1000, AsyncDelay::MILLIS);
   randomSeed(CircuitPlayground.lightSensor());
-  Serial.println("Game Begin");
   generateMIDI();
   
 
@@ -59,7 +57,10 @@ void setup(){
 void loop(){
   Soundlvl = CircuitPlayground.mic.soundPressureLevel(50);
   CircuitPlayground.clearPixels();
-  
+  ABgame = 0;
+  BBgame = 0;
+  Switchgame = 0;
+  Sgame = 0;
 
   if(Life <= 0){
     Serial.println("You lose *womp womp*");
@@ -95,12 +96,7 @@ void loop(){
   }
   
 
-
-
-  if(Delaytime_1s.isExpired()){
-    Rannum = random(0,4);
-    Delaytime_1s.repeat();
-  }
+  Rannum = random(0,4);
   delay(2000); 
 
  InputTopress(Rannum);
@@ -111,12 +107,13 @@ void loop(){
   ABgame = 0;
   BBgame = 0;
   Switchgame = 0;
+  Sgame = 0;
 
   while(!Delaygametime.isExpired()){
 
   Soundlvl = CircuitPlayground.mic.soundPressureLevel(50);
   
-  if(Soundlvl > 100){
+  if(Soundlvl > 110){
     Sgame = 1;
     break;
   }
@@ -129,7 +126,7 @@ void loop(){
   }
   
   if(AFlag){
-    delay(5);
+   delay(5);
    ABgame = 1;
    AFlag = false;
    break;
@@ -148,16 +145,11 @@ void loop(){
         if(ABgame){
           Serial.println("You pressed the A button!");
           CorrectANS = 1;
-          Bopem = 0;
           ABgame = 0;
           Delaygametime.expire();
-         
+         break;
         }else if(Delaygametime.isExpired() || BBgame || Switchgame || Sgame &! ABgame){
           Serial.println("Better luck next time!");
-          Bopem = 0;
-          BBgame = 0;
-          Switchgame = 0;
-          Sgame = 0;
           Delaygametime.expire();
         }
         break;
@@ -165,15 +157,11 @@ void loop(){
         if(BBgame){
           Serial.println("You pressed the B button!");
           CorrectANS = 1;
-          Bopem = 0;
           BBgame = 0;
           Delaygametime.expire();
+          break;
         }else if(Delaygametime.isExpired() || ABgame || Switchgame || Sgame &!BBgame){
           Serial.println("Better luck next time!");
-          Bopem = 0;
-          ABgame = 0;
-          Switchgame = 0;
-          Sgame = 0;
           Delaygametime.expire();
         }
         break;
@@ -181,15 +169,11 @@ void loop(){
         if(Switchgame){
           Serial.println("You switched it!");
           CorrectANS = 1;
-          Bopem = 0;
           Switchgame = 0;
           Delaygametime.expire();
+          break;
         }else if(Delaygametime.isExpired() || ABgame || BBgame || Sgame &!Switchgame){
           Serial.println("Better luck next time!");
-          Bopem = 0;
-          ABgame = 0;
-          BBgame = 0;
-          Sgame = 0;
           Delaygametime.expire();
         }
         break;
@@ -197,22 +181,23 @@ void loop(){
         if(Sgame){
           Serial.println("Woah, watch the volume");
           CorrectANS = 1;
-          Bopem = 0;
           Sgame = 0;
           Delaygametime.expire();
+          break;
         }else if(Delaygametime.isExpired() || ABgame || BBgame || Switchgame){
           Serial.println("Better luck next time!");
-          Bopem = 0;
-          ABgame = 0;
-          BBgame = 0;
-          Switchgame = 0;
           Delaygametime.expire();
         }
         break;
 
       default:
         break;
-    }   
+    }
+    
+    ABgame = 0;
+    BBgame = 0;
+    Switchgame = 0; 
+    Sgame = 0; 
  }
 
   if(CorrectANS){
@@ -220,11 +205,19 @@ void loop(){
     Serial.print("Score =");
     Serial.println(Score);
     CorrectANS = 0;
+    ABgame = 0;
+    BBgame = 0;
+    Switchgame = 0; 
+    Sgame = 0; 
   } else{
     Life = Life -1;
     Serial.println("Life -1");
     Serial.print("Life = ");
     Serial.println(Life);
+    ABgame = 0;
+    BBgame = 0;
+    Switchgame = 0; 
+    Sgame = 0; 
 
   }
 }
